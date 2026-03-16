@@ -32,5 +32,9 @@ public class PlayerMov : MonoBehaviour
         {
             animator.SetTrigger("Slide");
         }
+        if(!Input.anyKey)
+        {
+            animator.SetTrigger("Idle");
+        }
     }
 }
