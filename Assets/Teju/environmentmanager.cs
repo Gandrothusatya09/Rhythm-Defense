@@ -3,23 +3,48 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+[System.Serializable]
+public class EnvironmentSet
+{
+  public GameObject environment;
+  public Material skybox;
+}
+
 public class environmentmanager : MonoBehaviour
 {
-  public GameObject Poor;
-  public GameObject Better;
-  public GameObject Good;
-  public GameObject Perfect;
+  public EnvironmentSet Better;
+  public EnvironmentSet Good;
+  public EnvironmentSet Perfect;
   public TextMeshProUGUI scoreText;
   public GameObject scorePopup;
+
+  [SerializeField] private Transform playerTf;
+
   int Score = 0;
   float movetime = 0f;
   float idletime = 0f;
 
-  [SerializeField] private Transform playerTf;
+  EnvironmentSet currentEnv;
+
+  void Start()
+  {
+    Better.environment.SetActive(false);
+    Good.environment.SetActive(false);
+    Perfect.environment.SetActive(false);
+
+    ApplyEnvironment(Better);
+  }
 
   void Update()
   {
+    HandleMovement();
+    UpdateEnvironment();
+  }
+
+  void HandleMovement()
+  {
     bool movementkey = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
+
     if (movementkey)
     {
       movetime += 2 * Time.deltaTime;
@@ -30,59 +55,53 @@ public class environmentmanager : MonoBehaviour
       idletime += Time.deltaTime;
       movetime = 0f;
     }
+
     if (movetime > 5f)
     {
       Score += 10;
       movetime = 0f;
-      Debug.Log("Score: " + Score);
       scoreText.text = "Score: " + Score;
       StartCoroutine(ShowScorePopup("+10"));
     }
+
     if (idletime > 5f)
     {
       Score -= 10;
       idletime = 0f;
-      Debug.Log("Score: " + Score);
       scoreText.text = "Score: " + Score;
       StartCoroutine(ShowScorePopup("-10"));
     }
-    updateEnvironment();
+  }
 
-  }
-  void updateEnvironment()
+  void UpdateEnvironment()
   {
-    Debug.Log("Environment Update: Score = " + Score);
-    if (Score < 50)
-    {
-      ActivateEnvironment(Poor);
-      Debug.Log("Poor Environment Activated");
-    }
-    else if (Score >= 50 && Score < 100)
-    {
-      Debug.Log("Better Environment Activated");
-      ActivateEnvironment(Better);
-    }
-    else if (Score >= 100 && Score < 150)
-    {
-      Debug.Log("Good Environment Activated");
-      ActivateEnvironment(Good);
-    }
+    EnvironmentSet targetEnv;
+
+    if (Score < 100)
+      targetEnv = Better;
+    else if (100 <= Score && Score < 200)
+      targetEnv = Good;
     else
+      targetEnv = Perfect;
+    if (currentEnv != targetEnv)
     {
-      ActivateEnvironment(Perfect);
-      Debug.Log("Perfect Environment Activated");
+      ApplyEnvironment(targetEnv);
     }
   }
-  void ActivateEnvironment(GameObject environment)
+
+  void ApplyEnvironment(EnvironmentSet env)
   {
-    Poor.SetActive(false);
-    Better.SetActive(false);
-    Good.SetActive(false);
-    Perfect.SetActive(false);
-    environment.SetActive(true);
-    Vector3 envPos = environment.transform.position;
-    environment.transform.position = new Vector3(playerTf.position.x, envPos.y, envPos.z);
+    Better.environment.SetActive(false);
+    Good.environment.SetActive(false);
+    Perfect.environment.SetActive(false);
+    env.environment.SetActive(true);
+    Vector3 pos = env.environment.transform.position;
+    env.environment.transform.position = new Vector3(playerTf.position.x, pos.y, pos.z);
+    RenderSettings.skybox = env.skybox;
+    DynamicGI.UpdateEnvironment();
+    currentEnv = env;
   }
+
   IEnumerator ShowScorePopup(string message)
   {
     scorePopup.SetActive(true);
