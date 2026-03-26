@@ -21,11 +21,20 @@ public class PlayerMov : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-            animator.SetTrigger("WalkLeft");
+        //if (Input.GetKeyDown(KeyCode.A))
+        //    animator.SetTrigger("WalkLeft");
 
-        if (Input.GetKeyDown(KeyCode.D))
-            animator.SetTrigger("WalkRight");
+        //if (Input.GetKeyDown(KeyCode.D))
+        //    animator.SetTrigger("WalkRight");
+        if (Input.GetKey(KeyCode.W))
+        {
+            animator.SetBool("isWalking", true);
+          
+        }
+        else
+        {
+            animator.SetBool("isWalking", false);
+        }
 
         if (Input.GetKey(KeyCode.Q))
             transform.Rotate(Vector3.up * -rotationSpeed * Time.deltaTime);
