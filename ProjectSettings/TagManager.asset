@@ -9,6 +9,7 @@ TagManager:
   - Left Hand
   - Right Hand
   - Enemy
+  - Garbage
   layers:
   - Default
   - TransparentFX

@@ -87,7 +87,7 @@ public class environmentmanager : MonoBehaviour
   }
   void UpdateEnvironment()
   {
-
+       
 
     if (score < 100)
     {
